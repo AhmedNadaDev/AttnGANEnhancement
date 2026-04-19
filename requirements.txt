@@ -1,0 +1,21 @@
+# AttnGAN Kaggle — Python dependencies
+# All packages below are pre-installed in the Kaggle GPU runtime.
+# Run `pip install -r requirements.txt` only if you are running locally
+# or in a fresh environment.
+
+# Deep learning
+torch>=1.13.0
+torchvision>=0.14.0
+
+# Numerical / image
+numpy>=1.21.0
+Pillow>=9.0.0
+
+# NLP tokenisation
+nltk>=3.7
+
+# Configuration
+easydict>=1.10
+
+# (Optional) notebook display
+ipython>=7.0.0
