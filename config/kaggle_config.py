@@ -54,14 +54,17 @@ cfg.TEXT = edict()
 cfg.TEXT.EMBEDDING_DIM = 256  # RNN hidden size (total, both directions)
 cfg.TEXT.WORDS_NUM = 25       # max caption length
 cfg.TEXT.CAPTIONS_PER_IMAGE = 10
+cfg.TEXT.ENCODER_TYPE = "rnn"  # "rnn" (default) or "bert"
+cfg.TEXT.BERT_MODEL = "bert-base-uncased"
 
 # ─── Paths (set / overridden in main_kaggle.py) ──────────────────────────────
-# Kaggle dataset input directory containing model checkpoints and vocabulary.
+# Local default: project ./data and ./outputs (see main_kaggle.py).
+# Kaggle example: MODEL_DIR = "/kaggle/input/attngan-pretrained"
 cfg.MODEL_DIR = "/kaggle/input/attngan-pretrained"
 
 # Vocabulary pickle produced during AttnGAN dataset preprocessing.
 # Layout: [train_captions, test_captions, ixtoword, wordtoix]
 cfg.CAPTIONS_PICKLE = "captions.pickle"
 
-# Directory where generated images are written.
+# Directory where generated images are written (main_kaggle.py sets this).
 cfg.OUTPUT_DIR = "/kaggle/working/outputs"

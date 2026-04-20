@@ -1,20 +1,17 @@
 """
-main_kaggle.py — AttnGAN Kaggle inference entry point.
+main_kaggle.py — AttnGAN inference entry point (local or Kaggle).
 
-Usage (from inside the kaggle_attngan/ directory):
+Usage (from this project directory):
     python main_kaggle.py
 
-Or from the parent directory:
-    python kaggle_attngan/main_kaggle.py
+By default, pretrained weights are loaded from ./data (same three files as
+AttnGAN/eval/data/). On Kaggle, set MODEL_DIR (and optionally OUTPUT_DIR)
+in the PATH CONFIGURATION block below.
 
-Before running, update the PATH CONFIGURATION block below to match
-the paths inside your Kaggle notebook.
-
-Expected dataset layout (upload as a Kaggle dataset):
-    attngan-pretrained/
-    ├── captions.pickle        ← vocabulary (from CUB-200 preprocessing)
-    ├── text_encoder200.pth    ← DAMSM text encoder checkpoint
-    └── bird_AttnGAN2.pth     ← AttnGAN generator checkpoint
+Expected layout for MODEL_DIR:
+    captions.pickle        ← vocabulary (from CUB-200 preprocessing)
+    text_encoder200.pth    ← DAMSM text encoder checkpoint
+    bird_AttnGAN2.pth      ← AttnGAN generator checkpoint
 
 Pretrained files can be obtained from the original repository:
     https://github.com/taoxugit/AttnGAN
@@ -29,19 +26,27 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 
-# ── PATH CONFIGURATION — edit these for your Kaggle environment ──────────────
+# ── PATH CONFIGURATION — override on Kaggle if needed ────────────────────────
 
 # Directory containing model checkpoints + captions.pickle.
-# In Kaggle: /kaggle/input/<your-dataset-name>/
-MODEL_DIR = "/kaggle/input/attngan-pretrained"
+# Default: bundled <project>/data (copy of AttnGAN/eval/data).
+# Kaggle example: MODEL_DIR = "/kaggle/input/attngan-pretrained"
+MODEL_DIR = os.path.join(_HERE, "data")
 
 # File names inside MODEL_DIR (defaults match the released bird checkpoint).
 TEXT_ENCODER_FILE = "text_encoder200.pth"
 GENERATOR_FILE    = "bird_AttnGAN2.pth"
 VOCAB_FILE        = "captions.pickle"
+TEXT_ENCODER_TYPE = "rnn"  # set to "bert" for bert_text_encoder.pth
 
-# Where to write generated PNG images.
-OUTPUT_DIR = "/kaggle/working/outputs"
+# BERT-compatible Kaggle example:
+# TEXT_ENCODER_FILE = "bert_text_encoder.pth"
+# GENERATOR_FILE    = "bert_AttnGAN_generator.pth"
+# TEXT_ENCODER_TYPE = "bert"
+
+# Where to write generated PNG images (default: <project>/outputs).
+# Kaggle example: OUTPUT_DIR = "/kaggle/working/outputs"
+OUTPUT_DIR = os.path.join(_HERE, "outputs")
 
 # ── TEXT PROMPTS — add or modify freely ──────────────────────────────────────
 
@@ -69,6 +74,7 @@ def main() -> None:
     cfg.CAPTIONS_PICKLE = VOCAB_FILE
     cfg.TRAIN.NET_E     = TEXT_ENCODER_FILE
     cfg.TRAIN.NET_G     = GENERATOR_FILE
+    cfg.TEXT.ENCODER_TYPE = TEXT_ENCODER_TYPE
     cfg.OUTPUT_DIR      = OUTPUT_DIR
 
     # ── Verify model files exist before loading ───────────────────────────────
@@ -97,7 +103,7 @@ def main() -> None:
     from src.inference import run_inference, display_grid
 
     print("=" * 60)
-    print("  AttnGAN — Kaggle Text-to-Image Inference")
+    print("  AttnGAN - Text-to-Image Inference")
     print("=" * 60)
 
     wrapper = AttnGANWrapper(MODEL_DIR)

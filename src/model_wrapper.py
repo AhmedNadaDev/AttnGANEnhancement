@@ -30,6 +30,7 @@ if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
 
 from config.kaggle_config import cfg
+from src.bert_text_encoder import BERTTextEncoder
 
 # ─── Primitive building blocks ───────────────────────────────────────────────
 
@@ -413,12 +414,20 @@ class AttnGANWrapper:
         wordtoix = data[3]
         return wordtoix, ixtoword
 
-    def _load_text_encoder(self, path: str, n_words: int) -> RNN_ENCODER:
-        model = RNN_ENCODER(n_words, nhidden=cfg.TEXT.EMBEDDING_DIM)
+    def _load_text_encoder(self, path: str, n_words: int):
+        encoder_type = str(getattr(cfg.TEXT, "ENCODER_TYPE", "rnn")).lower()
+        if encoder_type == "bert":
+            model = BERTTextEncoder(
+                ixtoword=self.ixtoword,
+                embedding_dim=cfg.TEXT.EMBEDDING_DIM,
+                max_words=cfg.TEXT.WORDS_NUM,
+            )
+        else:
+            model = RNN_ENCODER(n_words, nhidden=cfg.TEXT.EMBEDDING_DIM)
         state = torch.load(path, map_location="cpu")
         model.load_state_dict(state)
         model.to(self.device).eval()
-        print(f"[AttnGAN] Text encoder loaded from {path}")
+        print(f"[AttnGAN] {encoder_type.upper()} text encoder loaded from {path}")
         return model
 
     def _load_generator(self, path: str) -> G_NET:
@@ -453,9 +462,13 @@ class AttnGANWrapper:
         noise = torch.FloatTensor(copies, cfg.GAN.Z_DIM).to(self.device)
 
         with torch.no_grad():
+            encoder_type = str(getattr(cfg.TEXT, "ENCODER_TYPE", "rnn")).lower()
             hidden = self.text_encoder.init_hidden(copies)
             words_embs, sent_emb = self.text_encoder(captions, cap_lens, hidden)
-            mask = (captions == 0)
+            if encoder_type == "bert" and getattr(self.text_encoder, "last_padding_mask", None) is not None:
+                mask = self.text_encoder.last_padding_mask.to(self.device)
+            else:
+                mask = (captions == 0)
             noise.normal_(0, 1)
             fake_imgs, _, _, _ = self.netG(noise, sent_emb, words_embs, mask)
 

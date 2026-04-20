@@ -1,21 +1,40 @@
-# AttnGAN Kaggle — Python dependencies
-# All packages below are pre-installed in the Kaggle GPU runtime.
-# Run `pip install -r requirements.txt` only if you are running locally
-# or in a fresh environment.
+# AttnGAN Enhanced Pipeline — Python dependencies
+# All packages in the first section are pre-installed in the Kaggle GPU runtime.
+# The CLIP section requires a one-time pip install (internet-enabled Kaggle session).
+#
+# Local install:
+#   pip install -r requirements.txt
 
-# Deep learning
+# ── Core deep learning ────────────────────────────────────────────────────────
 torch>=1.13.0
 torchvision>=0.14.0
 
-# Numerical / image
+# ── Numerical / image ─────────────────────────────────────────────────────────
 numpy>=1.21.0
 Pillow>=9.0.0
 
-# NLP tokenisation
+# ── NLP tokenisation ──────────────────────────────────────────────────────────
 nltk>=3.7
 
-# Configuration
+# ── Configuration ─────────────────────────────────────────────────────────────
 easydict>=1.10
 
-# (Optional) notebook display
+# ── CLIP (Stage 2 — reranking) ────────────────────────────────────────────────
+# Option A: HuggingFace transformers (recommended — works in most Kaggle kernels)
+transformers>=4.20.0
+ftfy>=6.0.0          # required by CLIP tokenizer
+regex>=2022.1.18     # required by CLIP tokenizer
+
+# Option B: OpenAI CLIP package (alternative — requires internet on Kaggle)
+# Uncomment the line below to use openai-clip backend instead of transformers:
+# openai-clip>=1.0.1
+
+# ── Optional: notebook display ────────────────────────────────────────────────
 ipython>=7.0.0
+
+# ── Optional: Real-ESRGAN super-resolution (Stage 3 upgrade) ─────────────────
+# Provides 4× learned upscaling instead of Lanczos.
+# Install only if you have a GPU and want the highest-quality upscaling:
+# basicsr>=1.4.2
+# realesrgan>=0.3.0
+# opencv-python>=4.5.0

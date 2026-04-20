@@ -115,7 +115,7 @@ def save_image(image: Image.Image, path: str) -> None:
     """Save a PIL image to *path*, creating parent directories as needed."""
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     image.save(path)
-    print(f"  Saved → {path}")
+    print(f"  Saved -> {path}")
 
 
 def mkdir_p(path: str) -> None:

@@ -44,7 +44,7 @@ def run_inference(
     mkdir_p(output_dir)
     saved_paths: list[str] = []
 
-    print(f"\n[Inference] Generating {len(texts)} image(s) → {output_dir}\n")
+    print(f"\n[Inference] Generating {len(texts)} image(s) -> {output_dir}\n")
 
     for idx, text in enumerate(texts, start=1):
         print(f"  [{idx}/{len(texts)}] Prompt: \"{text}\"")
@@ -52,7 +52,7 @@ def run_inference(
         try:
             image = wrapper.generate(text, copies=copies)
         except ValueError as exc:
-            print(f"    WARNING: Skipping — {exc}")
+            print(f"    WARNING: Skipping - {exc}")
             continue
 
         filename = f"{filename_prefix}_{idx:03d}.png"
@@ -91,6 +91,6 @@ def display_grid(image_paths: list[str], cols: int = 4) -> None:
         ipy_display(grid)
 
     except ImportError:
-        print("IPython not available — paths to saved images:")
+        print("IPython not available - paths to saved images:")
         for p in image_paths:
             print(f"  {p}")
